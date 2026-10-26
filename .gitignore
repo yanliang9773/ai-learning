@@ -1,0 +1,30 @@
+# 虚拟环境：体积大、每台机器不同，永远不提交
+.venv/
+venv/
+env/
+
+# 密钥：绝对、绝对不要提交
+.env
+*.env.local
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# pip 装包残留的临时目录（2026-10-26 实测会混进 git add）
+pip-unpack-*/
+pip-install-*/
+*.whl
+
+# 编辑器与系统杂物
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# 运行产物（想保留示例输出的话，把下面三行删掉即可）
+合并结果.xlsx
+test_*.xlsx
+*.log
