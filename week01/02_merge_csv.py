@@ -91,6 +91,13 @@ def clean(df: pd.DataFrame, source_name: str) -> pd.DataFrame:
             )
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # 5b. 转完数字后金额仍为空 = 原文是 "abc元" 这类解析不出来的脏值，删。
+    #     必须放在 to_numeric 之后：第 3 步只能删"格子本来就空"的行，
+    #     删不掉"有字但转不成数字"的——那时它还穿着字符串的皮，coerce 之后才现形。
+    #     （和 97 行删假日期是同一个道理：空值鬼和假值鬼要分两拨抓。）
+    if "金额" in df.columns:
+        df = df.dropna(subset=["金额"])
+
     # 6. 日期列转成真正的日期类型（Excel 里才能排序、做透视）
     if "日期" in df.columns:
         df["日期"] = pd.to_datetime(df["日期"], errors="coerce")
