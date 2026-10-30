@@ -109,7 +109,12 @@ def probe(payload: dict) -> None:
     """打印 JSON 结构 —— 拿到任何新 API 都先干这一步，别凭想象写字段名。"""
     print("\n  🔍 结构探查")
     for k, v in payload.items():
-        preview = f"dict，{len(v)} 个键，示例 {list(v)[:3]}" if isinstance(v, dict) else str(v)[:60]
+        if isinstance(v, dict):
+            preview = f"dict，{len(v)} 个键，示例 {list(v)[:3]}"
+        elif isinstance(v, list):
+            preview = f"list，{len(v)} 个元素，第 1 个长这样：{str(v[0])[:50] if v else '（空）'}"
+        else:
+            preview = str(v)[:60]
         print(f"     {k:<12} -> {preview}")
 
 
