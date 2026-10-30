@@ -27,6 +27,7 @@ RULES: dict[str, tuple[str, ...]] = {
     "安装包": (".exe", ".msi", ".apk"),
     "音视频": (".mp3", ".mp4", ".mkv", ".avi", ".wav", ".mov"),
     "代码": (".py", ".js", ".ts", ".json", ".html", ".css", ".ipynb"),
+    "数据": (".parquet", ".feather"),
 }
 
 # 反向查表：扩展名 -> 类别
