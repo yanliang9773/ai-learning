@@ -18,7 +18,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-api_key = "sk-proj-abc123def456ghi789jkl012"
+
 ROOT = Path(__file__).resolve().parent.parent   # 项目根目录
 
 # 明文密钥的常见长相。命中就报警 —— 这是第 3 周最重要的一个习惯。
