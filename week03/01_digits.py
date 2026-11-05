@@ -81,7 +81,7 @@ for k in (1, 3, 5, 15, 50, 150):
     print(f"{k:>4} {tr:>10.4f} {te:>10.4f}  {v}")
 
 
-ks = list(range(1, 151, 10))
+ks = list(range(1, 21)) + list(range(21, 151, 10))
 train_scores, test_scores = [], []
 for k in ks:
     m = KNeighborsClassifier(n_neighbors=k)
