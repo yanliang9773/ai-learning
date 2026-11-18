@@ -64,7 +64,7 @@ print(f"网络参数量：{n_params} 个 —— 训练就是在调这 {n_params}
 
 # ── 3. 损失函数 + 优化器 ──────────────────────────────────────
 loss_fn = nn.CrossEntropyLoss()             # 分类标配：输出打分→概率→对错
-opt = torch.optim.Adam(net.parameters(), lr=0.5)   # lr=每次拧多大，重要旋钮！
+opt = torch.optim.Adam(net.parameters(), lr=0.01)   # lr=每次拧多大，重要旋钮！
 
 # ── 4. 训练循环：四步的心脏在这里 ─────────────────────────────
 EPOCHS = 30
@@ -118,7 +118,7 @@ ax.set_title("第一次亲手训练：loss 从 ~2.3 掉下来的全过程")
 ax.grid(alpha=0.3)
 ax.legend()
 fig.tight_layout()
-out = BASE / "nn训练曲线2.png"
+out = BASE / "nn训练曲线.png"
 fig.savefig(out, dpi=130)
 print(f"✅ 曲线已存：{out}")
 
