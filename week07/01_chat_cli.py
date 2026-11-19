@@ -55,10 +55,11 @@ class ChatSession:
     是我们每次把完整历史都发过去，它才「看起来」记得。
     """
 
-    def __init__(self, client: OpenAI, model: str, system: str) -> None:
+    def __init__(self, client: OpenAI, model: str, system: str,temperature: float) -> None:
         self.client = client
         self.model = model
         self.messages: list[dict] = [{"role": "system", "content": system}]
+        self.temperature = temperature
         self.prompt_tokens = 0
         self.completion_tokens = 0
         self.calls = 0
@@ -73,14 +74,16 @@ class ChatSession:
                 return self._ask_stream()
             return self._ask_blocking()
         except Exception as exc:                       # noqa: BLE001
-            # 请求失败时把刚才加进去的用户消息撤掉，否则上下文会被脏数据污染
             self.messages.pop()
-            return f"❌ 调用失败：{type(exc).__name__}: {exc}"
+            err = f"❌ 调用失败：{type(exc).__name__}: {exc}"
+            print(err)          # ★ 错误当场喊出来
+            return err
 
     def _ask_stream(self) -> str:
         resp = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages,
+            temperature=self.temperature, 
             stream=True,
             # 让服务端在最后一个数据包里带上 token 用量
             stream_options={"include_usage": True},
@@ -102,7 +105,7 @@ class ChatSession:
         return answer
 
     def _ask_blocking(self) -> str:
-        resp = self.client.chat.completions.create(model=self.model, messages=self.messages)
+        resp = self.client.chat.completions.create(model=self.model, messages=self.messages,temperature=self.temperature)
         usage = resp.usage
         if usage:
             self.prompt_tokens += usage.prompt_tokens
@@ -137,6 +140,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--system", default="你是一个简洁、准确的中文助手。不确定就说不确定。",
                         help="系统提示词")
     parser.add_argument("--no-stream", action="store_true", help="关闭流式输出")
+    parser.add_argument("--temperature",type=float, default=1.0,help="采样温度，0最稳定，2最随机")
+    parser.add_argument("--ask", default=None, help="一次性提问（不走交互，适合批量实验）")
     args = parser.parse_args(argv)
 
     api_key = os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
@@ -152,12 +157,19 @@ def main(argv: list[str] | None = None) -> int:
         base_url=os.getenv("OPENAI_BASE_URL"),   # None 时自动用官方地址；国内兼容服务改这里
     )
 
-    s = ChatSession(client, args.model, args.system)
+    s = ChatSession(client, args.model, args.system,args.temperature)
     print("=" * 66)
     print(f"  模型: {args.model}")
     print(f"  端点: {os.getenv('OPENAI_BASE_URL') or '（官方默认）'}")
     print("  命令: /reset 清空  /cost 花费  /history 上下文  /help 帮助  exit 退出")
     print("=" * 66)
+
+    if args.ask:
+        print(f"\n你 > {args.ask}")
+        print("AI > ", end="", flush=True)
+        s.ask(args.ask, stream=not args.no_stream)
+        print(s.report())
+        return 0
 
     while True:
         try:
@@ -187,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
         t0 = time.time()
         print("AI > ", end="", flush=True)
         s.ask(text, stream=not args.no_stream)
-        print(f"  ⏱ {time.time() - t0:.1f}s")
+        print(f"  [耗时 {time.time() - t0:.1f}s]")
 
 
 if __name__ == "__main__":
