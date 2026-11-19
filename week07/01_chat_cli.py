@@ -45,7 +45,7 @@ except ImportError:
 
 
 # 粗略价格表（美元/百万 token）。真实价格去服务商控制台查，这里只为让你有成本意识。
-PRICE = {"prompt": 2.50, "completion": 10.00}
+PRICE = {"prompt": 1/7.2, "completion": 6/7.2}   # cctq gpt-5.6-sol：¥1/¥6 每百万token，折美元
 
 
 class ChatSession:
